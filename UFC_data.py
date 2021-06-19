@@ -1,46 +1,84 @@
-#%%
+# %%
 import time
 from selenium import webdriver
 import pprint
-#%%
-driver = webdriver.Chrome(executable_path='C:\\Users\\migue\\Downloads\\chromedriver_win32\\chromedriver.exe')
-URL = "http://www.ufcstats.com/statistics/events/completed"
-driver.get(URL)
-#%%
-# find all fight events in history available.
-fight_events_links = driver.find_elements_by_css_selector(".b-statistics__table-content [href]")
-# # each fight night event has a link where multiple fights occured.
-# # Get access to the even containing these fights.
-# # to then access indvidual fights and pull info out
-fight_event_links_ls = [fight_event_link.get_attribute('href') for fight_event_link in fight_events_links]
-print(fight_event_links_ls)
-print(len(fight_event_links_ls))
+def links_to_fight_night_events(URL="http://www.ufcstats.com/statistics/events/completed"):
+
+    executable_path = 'C:\\Users\\migue\\Downloads\\chromedriver_win32\\chromedriver.exe'
+
+    driver = webdriver.Chrome(executable_path=executable_path)
+    # URL to all fight events in the past
+    # URL = "http://www.ufcstats.com/statistics/events/completed"
+    driver.get(URL)
+    # Contains the links of fight night events that occur at a given night.
+    # So each event/night contains multiple fights
+    fight_events_links = driver.find_elements_by_css_selector(".b-statistics__table-content [href]")
+    # print(fight_events_links)
+    # Get the links to these fight night events containing multiple fights.
+    fight_event_links_ls = [fight_event_link.get_attribute('href') for fight_event_link in fight_events_links]
+    # print("-------------")
+    # The first row is for upcoming fights, ignore it.
+    fight_event_links_ls = fight_event_links_ls[1:]
+    # print("fight night events links")
+    # print(fight_event_links_ls)
+    # print(len(fight_event_links_ls))
+    return fight_event_links_ls, driver
+# %%
+# contains all links for the fights. the links contain the stats of that fight.
+def links_to_fights_stats_1_vs_1(fight_event_links_ls, driver):
+
+    all_fights_links_1_vs_1 = []
+    counts = []
+    for fight_night_event_link in fight_event_links_ls:
+        count = 0
+        # link_fight_night = fight_event_links_ls[fight_night_event_idx]
+        # finding the elements with the class to find the link for particular fight.
+        driver.get(fight_night_event_link)
+        fights_links_in_fight_night = driver.find_elements_by_xpath("//tbody[@class='b-fight-details__table-body']/tr")
+        for fight_1_vs_1_link in fights_links_in_fight_night:
+            count += 1
+            # contains all fight 1 vs 1 links from which will get stats.
+            all_fights_links_1_vs_1.append(fight_1_vs_1_link.get_attribute("data-link"))
+        counts.append(count)
+    
+    if sum(counts) == len(all_fights_links_1_vs_1):
+        return all_fights_links_1_vs_1
+    else:
+        return 0
 
 
+def links_to_fights_stats_1_vs_1_test_range(fight_event_links_ls, driver):
 
-# fighters can draw not always green box
-# fix
-# for i in range(1,2): #len(fight_event_links_ls)):
-    # print("index = ",  i)
-    # print(fight_event_links_ls[i])
-    # print("============")
-driver.get('http://www.ufcstats.com/event-details/0b64d0fed453ef7f')
-#     # driver.get(fight_event_links_ls[i])
-fights_at_an_event = driver.find_elements_by_xpath("//tbody[@class='b-fight-details__table-body']/tr")
-count = 0
-for fight in fights_at_an_event:
-    count += 1
-    print(fight.get_attribute("data-link"))
-    print("count = ", count)
-    print("--------------")
-# for fight in fights_at_an_event:
-#     print(fight.text)
-#     driver.quit()
+    all_fights_links_1_vs_1 = []
+    counts = []
+    for fight_night_event_idx in range(0, 1):
+        count = 0
+        link_fight_night = fight_event_links_ls[fight_night_event_idx]
+        # finding the elements with the class to find the link for particular fight.
+        driver.get(link_fight_night)
+        fights_links_in_fight_night = driver.find_elements_by_xpath("//tbody[@class='b-fight-details__table-body']/tr")
+        for fight_1_vs_1_link in fights_links_in_fight_night:
+            count += 1
+            # contains all fight 1 vs 1 links from which will get stats.
+            all_fights_links_1_vs_1.append(fight_1_vs_1_link.get_attribute("data-link"))
+        counts.append(count)
 
-# fight_1_1 = fights_at_an_event.get_attribute("data-link")
-# fight_event_links_ls = [fight_event_link.get_attribute('data-link') for fight_event_link in fights_at_an_event]
+    if sum(counts) == len(all_fights_links_1_vs_1):
+        return all_fights_links_1_vs_1
+    else:
+        return 0
+# %%
+# links_to_fight_night_events, driver = links_to_fight_night_events()
+# fight_links = links_to_fights_stats_1_vs_1_test_range(links_to_fight_night_events, driver)
+# print(fight_links)
+# print(len(fight_links))
 
-    # fights_data_loc_link = [fight_1_vs_1.get_attribute('href') for fight_1_vs_1 in fights_at_an_event]
-# print(fight_event_links_ls)
-# print(fights_data_loc_link)
-# print(len(fights_data_loc_link))
+# %%
+
+# Need to classify data by weightclass, then who won,
+# what did they to win
+URL = 'http://www.ufcstats.com/fight-details/6cd44e1b2d093ea4'
+# if the box is greeen in the class name, find the name of the fighter.
+# Using the name of the fighter pull out all of the totals and significant strikes data.
+
+# %%
