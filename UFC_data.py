@@ -21,19 +21,35 @@ print(len(fight_event_links_ls))
 
 # %%
 # contains all links for the fights. the links contain the stats of that fight.
+
 all_fights_links_1_vs_1 = []
 counts = []
-for fight_night_event_idx in range(0, len(fight_event_links_ls)):
+for fight_night_event_link in fight_event_links_ls:
     count = 0
-    link_fight_night = fight_event_links_ls[fight_night_event_idx]
+    # link_fight_night = fight_event_links_ls[fight_night_event_idx]
     # finding the elements with the class to find the link for particular fight.
-    driver.get(link_fight_night)
+    driver.get(fight_night_event_link)
     fights_links_in_fight_night = driver.find_elements_by_xpath("//tbody[@class='b-fight-details__table-body']/tr")
     for fight_1_vs_1_link in fights_links_in_fight_night:
         count += 1
         # contains all fight 1 vs 1 links from which will get stats.
         all_fights_links_1_vs_1.append(fight_1_vs_1_link.get_attribute("data-link"))
     counts.append(count)
+
+
+# all_fights_links_1_vs_1 = []
+# counts = []
+# for fight_night_event_idx in range(0, len(fight_event_links_ls)):
+#     count = 0
+#     link_fight_night = fight_event_links_ls[fight_night_event_idx]
+#     # finding the elements with the class to find the link for particular fight.
+#     driver.get(link_fight_night)
+#     fights_links_in_fight_night = driver.find_elements_by_xpath("//tbody[@class='b-fight-details__table-body']/tr")
+#     for fight_1_vs_1_link in fights_links_in_fight_night:
+#         count += 1
+#         # contains all fight 1 vs 1 links from which will get stats.
+#         all_fights_links_1_vs_1.append(fight_1_vs_1_link.get_attribute("data-link"))
+#     counts.append(count)
 # %%
 # if sum of counts which indicate how many links there are belonging to a fight
 # is equal to the amount of links in all_fights_at_an_event_night
