@@ -77,8 +77,16 @@ def links_to_fights_stats_1_vs_1_test_range(fight_event_links_ls, driver):
 
 # Need to classify data by weightclass, then who won,
 # what did they to win
-URL = 'http://www.ufcstats.com/fight-details/6cd44e1b2d093ea4'
 # if the box is greeen in the class name, find the name of the fighter.
 # Using the name of the fighter pull out all of the totals and significant strikes data.
-
+import time
+from selenium import webdriver
+import pprint
+executable_path = 'C:\\Users\\migue\\Downloads\\chromedriver_win32\\chromedriver.exe'
+driver = webdriver.Chrome(executable_path=executable_path)
+URL = 'http://www.ufcstats.com/fight-details/6cd44e1b2d093ea4'
+driver.get(URL)
+win_fighter = driver.find_element_by_xpath("//div[@class='b-fight-details__person']")
+fighter_w = win_fighter.find_element_by_xpath(".//i").text
+fighter_w_name = win_fighter.find_element_by_xpath(".")
 # %%
