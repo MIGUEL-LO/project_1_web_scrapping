@@ -74,7 +74,6 @@ def links_to_fights_stats_1_vs_1_test_range(fight_event_links_ls, driver):
 # print(len(fight_links))
 
 # %%
-
 # Need to classify data by weightclass, then who won,
 # what did they to win
 # if the box is greeen in the class name, find the name of the fighter.
@@ -86,7 +85,46 @@ executable_path = 'C:\\Users\\migue\\Downloads\\chromedriver_win32\\chromedriver
 driver = webdriver.Chrome(executable_path=executable_path)
 URL = 'http://www.ufcstats.com/fight-details/6cd44e1b2d093ea4'
 driver.get(URL)
-win_fighter = driver.find_element_by_xpath("//div[@class='b-fight-details__person']")
+win_fighter = driver.find_elements_by_xpath("//div[@class='b-fight-details__person']")
 fighter_w = win_fighter.find_element_by_xpath(".//i").text
-fighter_w_name = win_fighter.find_element_by_xpath(".")
+fighter_w_name = win_fighter.find_element_by_xpath(".//h3").text
+# %%
+import time
+from selenium import webdriver
+import pprint
+executable_path = 'C:\\Users\\migue\\Downloads\\chromedriver_win32\\chromedriver.exe'
+driver = webdriver.Chrome(executable_path=executable_path)
+URL = 'http://www.ufcstats.com/fight-details/6cd44e1b2d093ea4'
+driver.get(URL)
+win_lose_fighter_name_elements = driver.find_elements_by_class_name("b-fight-details__person")
+# win_fighter = win_lose_fighter_name_elements.find_element_by_class_name("b-fight-details__person")
+# winner = driver
+# %%
+print(win_lose_fighter_name_elements)
+for win in win_lose_fighter_name_elements:
+    # for w_n in win.text:
+    #     print(w_n)
+    w = win.text
+    print("win or na = ", w[2])
+    # print("name = ", name)
+    # print("title", tittle)
+    print("========")
+#%%
+fighter_w = win_fighter.find_element_by_xpath(".//i")
+fighter_w_name = win_fighter.find_element_by_xpath(".//h3")
+print(fighter_w)
+print(fighter_w_name)
+
+
+
+
+
+# for w_L in fighter_w:
+#     print(w_L)
+# for fighter_name in fighter_w_name:
+#     print(fighter_name)
+# print(fighter_w_name.split())
+# %%
+print(fighter_w)
+print(fighter_w_name)
 # %%
