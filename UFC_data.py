@@ -68,6 +68,8 @@ def links_to_fights_stats_1_vs_1_test_range(fight_event_links_ls, driver):
     else:
         return 0
 # %%
+
+
 # links_to_fight_night_events, driver = links_to_fight_night_events()
 # fight_links = links_to_fights_stats_1_vs_1_test_range(links_to_fight_night_events, driver)
 # print(fight_links)
@@ -101,30 +103,12 @@ win_lose_fighter_name_elements = driver.find_elements_by_class_name("b-fight-det
 # winner = driver
 # %%
 print(win_lose_fighter_name_elements)
-for win in win_lose_fighter_name_elements:
-    # for w_n in win.text:
-    #     print(w_n)
-    w = win.text
-    print("win or na = ", w[2])
-    # print("name = ", name)
-    # print("title", tittle)
-    print("========")
+for eles in win_lose_fighter_name_elements:
+    fighter_w_or_l = eles.find_element_by_xpath()
+    print(eles)
+
+
 #%%
-fighter_w = win_fighter.find_element_by_xpath(".//i")
-fighter_w_name = win_fighter.find_element_by_xpath(".//h3")
-print(fighter_w)
-print(fighter_w_name)
-
-
-
-
-
-# for w_L in fighter_w:
-#     print(w_L)
-# for fighter_name in fighter_w_name:
-#     print(fighter_name)
-# print(fighter_w_name.split())
-# %%
-print(fighter_w)
-print(fighter_w_name)
-# %%
+for win in win_lose_fighter_name_elements:
+    w = win.text.split()
+    print("win or na = ", w)
