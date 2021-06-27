@@ -12,7 +12,10 @@ class UFC:
         self.URL = URL
 
     def links_to_fight_night_events(self):
-
+        ''' Finds all the links corresponding to a fighting night event.
+        Night events may contain multiple fights from different weight classes,
+        and genders.
+        '''
         executable_path = '/usr/bin/chromedriver'
         driver = webdriver.Chrome(executable_path=executable_path)
         # URL to all fight events in the past
@@ -36,6 +39,10 @@ class UFC:
 
 
     def links_to_fights_stats_1_vs_1(self, fight_event_links_ls, driver):
+        '''
+        Finds all the links which contain the fighting stats for a particular fight,
+        in a fight night event.
+        '''
         # fight_event_links_ls, driver = self.links_to_fight_night_events()
         all_fights_links_1_vs_1 = []
         counts = []
@@ -58,6 +65,12 @@ class UFC:
     
     
     def get_fight_stats(self, URL, driver):
+        '''
+        Scrapes the fighting stats for a given fight.
+        Includes fighters name and result, total number of strikes and significant strikes.
+        The percentages of landed hits in a given location either head, body or legs.
+        Also includes submission stats.
+        '''
         
         driver.get(URL)
         w_or_l = []
@@ -183,6 +196,11 @@ class UFC:
         return weight_division, first_fighter_w_or_l, second_fighter_w_or_l, first_fighter_name, second_fighter_name, total_strike_headers, first_fighter_tot_strikes, second_fighter_tot_strikes, sig_strike_headers, first_fighter_sig_strikes, second_fighter_sig_strikes, landed_by_target_headers, first_fighter_landed_by_target, second_fighter_landed_by_target, landed_by_position_headers, first_fighter_landed_by_position, second_fighter_landed_by_position
 
     def creating_UFC_df(self, fight_links_stats, driver):
+        '''
+        Creates a dataframe by populating dataframe row wise.
+        Since there will always be an even number of fighters due to the nature of 1 vs 1 fights.
+        Fights are linked by an id which let's you compare results for that particular fight.
+        '''
         # i = 0
         j = 0
         id = 0
@@ -224,7 +242,9 @@ class UFC:
         return df
 
     def upload_db(self, df):
-
+        '''
+        Uploads dataframe to AWS RDS database.
+        '''
         db_name = "postgres"
         db_user = "postgres"
         db_pass = "postgres"
