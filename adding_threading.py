@@ -1,11 +1,13 @@
 #%%
-import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import pandas as pd
+from IPython.display import display
+from sqlalchemy import create_engine
 
-
+#%%
 def links_to_fight_night_events(URL="http://www.ufcstats.com/statistics/events/completed"):
     
     executable_path = '/usr/bin/chromedriver'
@@ -29,29 +31,6 @@ def links_to_fight_night_events(URL="http://www.ufcstats.com/statistics/events/c
 
     return fight_event_links_ls, driver 
 
-
-def links_to_fight_night_events_test(URL="http://www.ufcstats.com/statistics/events/completed"):
-    
-    executable_path = '/usr/bin/chromedriver'
-    driver = webdriver.Chrome(executable_path=executable_path)
-    # URL to all fight events in the past
-    driver.get(URL)
-    # pages_buttons_class = driver.find_element_by_class_name("b-statistics__paginate")
-    # pages_eles = pages_buttons_class.find_elements_by_tag_name("li")
-    # all_button = pages_eles[-1]
-    # all_button.click()
-    # URL = driver.current_url
-    # driver.get(URL)
-
-    # Contains the links of fight night events that occur at a given night.
-    # So each event/night contains multiple fights
-    fight_events_links = driver.find_elements_by_css_selector(".b-statistics__table-content [href]")
-
-    # Get the links to these fight night events containing multiple fights.
-    fight_event_links_ls = [fight_event_link.get_attribute('href') for fight_event_link in fight_events_links]
-    fight_event_links_ls = fight_event_links_ls[1:]
-
-    return fight_event_links_ls, driver 
 
 def links_to_fights_stats_1_vs_1(fight_event_links_ls, driver):
     
@@ -77,11 +56,7 @@ def links_to_fights_stats_1_vs_1(fight_event_links_ls, driver):
 
 def get_fight_stats(URL, driver):
 
-    # executable_path = '/usr/bin/chromedriver'
-    # driver = webdriver.Chrome(executable_path=executable_path)
-    # URL = 'http://www.ufcstats.com/fight-details/6cd44e1b2d093ea4'
     driver.get(URL)
-    w_or_l_fighter_name = []
     w_or_l = []
     fighter_name = []
 
@@ -204,46 +179,9 @@ def get_fight_stats(URL, driver):
 
     return weight_division, first_fighter_w_or_l, second_fighter_w_or_l, first_fighter_name, second_fighter_name, total_strike_headers, first_fighter_tot_strikes, second_fighter_tot_strikes, sig_strike_headers, first_fighter_sig_strikes, second_fighter_sig_strikes, landed_by_target_headers, first_fighter_landed_by_target, second_fighter_landed_by_target, landed_by_position_headers, first_fighter_landed_by_position, second_fighter_landed_by_position
 
-# executable_path = '/usr/bin/chromedriver'
-# driver = webdriver.Chrome(executable_path=executable_path)
-# URL = 'http://www.ufcstats.com/fight-details/6cd44e1b2d093ea4'
-# #
-
-# a = get_fight_stats(URL, driver)
-
-# for i in a:
-#     print(i)
-
-
-
-    # = print(links_to_fight_night_events())
-# print(current_url)
-# fight_event_links_ls, driver = print(links_to_fight_night_events())
-# print(driver)
-#%%
-        # i += 1
-# links_to_fight_night_events_2, driver = links_to_fight_night_events_test()
-# links_to_fight_night_events_test_e = links_to_fight_night_events_2
-# print(links_to_fight_night_events_test_e, "\n")
-
-# fight_links_stats, driver = links_to_fights_stats_1_vs_1(links_to_fight_night_events_test_e, driver)
-# print(fight_links_stats, "\n")
-
 links_to_fight_night_events_, driver = links_to_fight_night_events()
 fight_links_stats, driver = links_to_fights_stats_1_vs_1(links_to_fight_night_events_, driver)
 print(fight_links_stats, "\n")
-
-
-# fight_links_stats, driver_ = links_to_fights_stats_1_vs_1(links_to_fight_night_events_, driver)
-# print(fight_links_stats)
-#%%
-fight_links_stats_test = fight_links_stats[2]
-
-#%%
-import pandas as pd
-from IPython.display import display
-
-# %%
 
 
 
@@ -301,6 +239,24 @@ for fight_link in fight_links_stats:
 # print(len(fight_links_stats))
 # %%
 df.to_csv("fight_stats_2.csv")
+
 # %%
-df
+df = pd.read_csv("fight_stats.csv")
+display(df)
+# %%
+df = df.drop(columns=['FIGHTER'])
+df.drop(df.filter(regex="Unname"),axis=1, inplace=True)
+display(df)
+# %%
+
+db_name = "postgres"
+db_user = "postgres"
+db_pass = "postgres"
+db_host = "database-2.ce8hdmrsyawr.eu-west-2.rds.amazonaws.com"
+db_port = "5432"
+
+DB_URI = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
+engine = create_engine(DB_URI)
+engine.connect()
+df.to_sql(name="UFC_data", con=engine, schema="public", if_exists="replace", index=False)
 # %%
