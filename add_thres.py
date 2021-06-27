@@ -1,87 +1,74 @@
 #%%
 import time
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-
-def links_to_fight_night_events(URL="http://www.ufcstats.com/statistics/events/completed"):
-    
-    executable_path = '/usr/bin/chromedriver'
-    driver = webdriver.Chrome(executable_path=executable_path)
-    # URL to all fight events in the past
-    driver.get(URL)
-    pages_buttons_class = driver.find_element_by_class_name("b-statistics__paginate")
-    pages_eles = pages_buttons_class.find_elements_by_tag_name("li")
-    all_button = pages_eles[-1]
-    all_button.click()
-    URL = driver.current_url
-    driver.get(URL)
-
-    # Contains the links of fight night events that occur at a given night.
-    # So each event/night contains multiple fights
-    fight_events_links = driver.find_elements_by_css_selector(".b-statistics__table-content [href]")
-
-    # Get the links to these fight night events containing multiple fights.
-    fight_event_links_ls = [fight_event_link.get_attribute('href') for fight_event_link in fight_events_links]
-    fight_event_links_ls = fight_event_links_ls[1:]
-
-    return fight_event_links_ls, driver 
+from bs4 import BeautifulSoup
+import requests
+import concurrent.futures
 
 
 def links_to_fight_night_events_test(URL="http://www.ufcstats.com/statistics/events/completed"):
-    
-    executable_path = '/usr/bin/chromedriver'
-    driver = webdriver.Chrome(executable_path=executable_path)
+   
+    # executable_path = '/usr/bin/chromedriver'
+    source = requests.get(URL).text
     # URL to all fight events in the past
-    driver.get(URL)
-    # pages_buttons_class = driver.find_element_by_class_name("b-statistics__paginate")
-    # pages_eles = pages_buttons_class.find_elements_by_tag_name("li")
-    # all_button = pages_eles[-1]
-    # all_button.click()
-    # URL = driver.current_url
     # driver.get(URL)
-
-    # Contains the links of fight night events that occur at a given night.
-    # So each event/night contains multiple fights
-    fight_events_links = driver.find_elements_by_css_selector(".b-statistics__table-content [href]")
-
-    # Get the links to these fight night events containing multiple fights.
-    fight_event_links_ls = [fight_event_link.get_attribute('href') for fight_event_link in fight_events_links]
+    soup = BeautifulSoup(source, 'lxml')
+    fight_table = soup.find('table')
+    fight_links = fight_table.find_all("i")
+    fight_event_links_ls = [fight_link.a['href'] for fight_link in fight_links]
     fight_event_links_ls = fight_event_links_ls[1:]
+    return fight_event_links_ls
+fight_event_links = links_to_fight_night_events_test()
+#%%
+# fight_event_link = fight_event_links[0]
+####################
 
-    return fight_event_links_ls, driver 
+def links_to_fights_stats_1_vs_1_night(fight_event_link):
+   
+    try:
+        all_fights_links_1_vs_1 = []
+        # for fight_night_event_link in fight_event_links_ls:
+        source = requests.get(fight_event_link).text
 
-def links_to_fights_stats_1_vs_1(fight_event_links_ls, driver):
-    
-    all_fights_links_1_vs_1 = []
-    counts = []
-    for fight_night_event_link in fight_event_links_ls:
-        count = 0
-        # link_fight_night = fight_event_links_ls[fight_night_event_idx]
-        # finding the elements with the class to find the link for particular fight.
-        driver.get(fight_night_event_link)
-        fights_links_in_fight_night = driver.find_elements_by_xpath("//tbody[@class='b-fight-details__table-body']/tr")
-        for fight_1_vs_1_link in fights_links_in_fight_night:
-            count += 1
-            # contains all fight 1 vs 1 links from which will get stats.
-            all_fights_links_1_vs_1.append(fight_1_vs_1_link.get_attribute("data-link"))
-        counts.append(count)
-    
-    if sum(counts) == len(all_fights_links_1_vs_1):
-        return all_fights_links_1_vs_1, driver
-    else:
-        return 0
-    
+        soup = BeautifulSoup(source, 'lxml')
+        fight_table = soup.find('table')
+        fights_links_in_fight_night = fight_table.find_all("td", {"class": "b-fight-details__table-col b-fight-details__table-col_style_align-top"})
+        for fight_link in fights_links_in_fight_night:
+            tag_links = fight_link.find('a')
+            if tag_links != None:
+                all_fights_links_1_vs_1.append(tag_links['href'])
+        
+        # print(all_fights_links_1_vs_1)
+        # return all_fights_links_1_vs_1
+        # return all_fights_links_1_vs_1
+        print(fights_links_in_fight_night)
+    except:
+        print("error")
+# def links_to_fights_stats_1_vs_1(links_to_fights_stats_1_vs_1_night, fight_event_links):
+# i = 0 
+all_1_vs_links = []
+with concurrent.futures.ThreadPoolExecutor() as executor:
+    results = [executor.submit(links_to_fights_stats_1_vs_1_night, url) for url in fight_event_links]
 
+    for f in concurrent.futures.as_completed(results): 
+        print(f.result())
+        # executor.map(links_to_fights_stats_1_vs_1_night, fight_event_links)
+        
+        # print(num)
+    # for links in executor.map(links_to_fights_stats_1_vs_1_night, fight_event_links):
+        # print(links)
+# print(all_fights_links_1_vs_1)
+
+# links_to_fights_stats_1_vs_1(links_to_fights_stats_1_vs_1_night(fight_event_link), fight_event_links)
+
+# links_to_fights_stats_1_vs_1(fight_event_link)
+#######################
+#%%
 def get_fight_stats(URL, driver):
 
     # executable_path = '/usr/bin/chromedriver'
     # driver = webdriver.Chrome(executable_path=executable_path)
     # URL = 'http://www.ufcstats.com/fight-details/6cd44e1b2d093ea4'
     driver.get(URL)
-    w_or_l_fighter_name = []
     w_or_l = []
     fighter_name = []
 
@@ -92,11 +79,11 @@ def get_fight_stats(URL, driver):
     sig_strike_headers = []
     first_fighter_sig_strikes = []
     second_fighter_sig_strikes = []
-    
+   
     landed_by_target_headers = []
     first_fighter_landed_by_target = []
     second_fighter_landed_by_target = []
-    
+   
     landed_by_position_headers = []
     first_fighter_landed_by_position = []
     second_fighter_landed_by_position = []
@@ -130,17 +117,17 @@ def get_fight_stats(URL, driver):
     # print(total_strikes_sig_strikes_headers)
     total_strikes_headers_eles = total_strikes_sig_strikes_headers[0]
     total_strikes_headers_eles_indiv = total_strikes_headers_eles.find_elements_by_tag_name("th")
-# 
+#
     for tot_header in total_strikes_headers_eles_indiv:
         total_strike_headers.append(tot_header.text)
-# 
+#
     sig_strikes_headers_eles = total_strikes_sig_strikes_headers[1]
     sig_strikes_headers_eles_indiv = sig_strikes_headers_eles.find_elements_by_tag_name("th")
-# 
+#
     for sig_header in sig_strikes_headers_eles_indiv:
         sig_strike_headers.append(sig_header.text)
-# 
-# 
+#
+#
     total_strikes_sig_strikes_stats_ele = page_container.find_elements_by_xpath("//tbody[@class='b-fight-details__table-body']")    
     total_strikes_stats_ele =  total_strikes_sig_strikes_stats_ele[0]
     total_strikes_stats_ele_vals = total_strikes_stats_ele.find_elements_by_tag_name("p")
@@ -301,4 +288,3 @@ for fight_link in fight_links_stats:
 # print(len(fight_links_stats))
 # %%
 df
-# %%

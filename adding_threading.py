@@ -300,5 +300,7 @@ for fight_link in fight_links_stats:
 # %%
 # print(len(fight_links_stats))
 # %%
+df.to_csv("fight_stats_2.csv")
+# %%
 df
 # %%
