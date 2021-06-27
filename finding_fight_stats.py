@@ -1,131 +1,137 @@
-#%%
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-executable_path = '/usr/bin/chromedriver'
-driver = webdriver.Chrome(executable_path=executable_path)
-URL = 'http://www.ufcstats.com/fight-details/6cd44e1b2d093ea4'
-driver.get(URL)
-w_or_l_fighter_name = []
-total_strike_headers = []
-fighter_name_total_strike = []
-fighter_striking_stats = []
-significant_strikes_col_names = []
-significant_strikes_vals = []
-#%%
-try:
+
+def get_fight_stats(URL, driver):
+
+    # executable_path = '/usr/bin/chromedriver'
+    # driver = webdriver.Chrome(executable_path=executable_path)
+    # URL = 'http://www.ufcstats.com/fight-details/6cd44e1b2d093ea4'
+    driver.get(URL)
+    w_or_l_fighter_name = []
+    
+    total_strike_headers = []
+    first_fighter_tot_strikes = []
+    second_fighter_tot_strikes = []
+
+    sig_strike_headers = []
+    first_fighter_sig_strikes = []
+    second_fighter_sig_strikes = []
+    
+    landed_by_target_headers = []
+    first_fighter_landed_by_target = []
+    second_fighter_landed_by_target = []
+    
+    landed_by_position_headers = []
+    first_fighter_landed_by_position = []
+    second_fighter_landed_by_position = []
+
+
     page_container = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "l-page__container")))
 
     fight_details = page_container.find_element_by_xpath("//div[@class='b-fight-details']")
     fight_details_person = fight_details.find_elements_by_class_name("b-fight-details__person")
 
-    weight_division = fight_details.find_element_by_class_name("b-fight-details__fight-head")
-    weight_division = weight_division.find_element_by_tag_name("i")
+    weight_division = fight_details.find_element_by_class_name("b-fight-details__fight-title").text
+
+    for fighter_detail in fight_details_person:
+            # Fight result and corresponding fighter name
+        w_or_l = fighter_detail.find_element_by_tag_name("i").text
+        name = fighter_detail.find_element_by_tag_name("a").text
+        w_or_l_fighter_name.append((w_or_l, name))
+    
+    # print(w_or_l_fighter_name, "erm")
 
 
-    total_strikes_sig_strikes_headers_ele = page_container.find_elements_by_xpath("//thead[@class='b-fight-details__table-head']")
-    total_strikes_headers_ele, sig_strikes_headers_ele = total_strikes_sig_strikes_headers_ele[0]
-     
-    print(total_strikes_sig_strikes_headers_ele, "\n")
-    total_strikes_sig_strikes_stats_ele = page_container.find_elements_by_xpath("//tbody[@class='b-fight-details__table-body']")
-    print(total_strikes_sig_strikes_stats_ele, "\n")
+
+    # headers for tots and sig strikes
+    # stats belonging to headers
+    total_strikes_sig_strikes_headers = page_container.find_elements_by_xpath("//thead[@class='b-fight-details__table-head']")    
+    # print(total_strikes_sig_strikes_headers)
+    total_strikes_headers_eles = total_strikes_sig_strikes_headers[0]
+    total_strikes_headers_eles_indiv = total_strikes_headers_eles.find_elements_by_tag_name("th")
 # 
-    # striking_columns = tots_headers.find_elements_by_xpath("th")
-    # fight_scores = totals.find_element_by_xpath("//table//tbody/tr")
+    for tot_header in total_strikes_headers_eles_indiv:
+        total_strike_headers.append(tot_header.text)
 # 
-    # fighter_names = fight_scores.find_elements_by_tag_name("a")
-    # fight_stats_tots = fight_scores.find_elements_by_xpath("td")
-    # 
-    # significant_strikes_header = page_container.find_elements_by_xpath("//tbody[@class='b-fight-details__table-body']")[1]
-    # sig_fight_scores = totals.find_element_by_xpath("//table//tbody/tr")
-    # 
-    # sig_fighter_names = sig_fight_scores.find_elements_by_tag_name("a")
-    # sig_fight_stats_tots = sig_fight_scores.find_elements_by_xpath("td")
+    sig_strikes_headers_eles = total_strikes_sig_strikes_headers[1]
+    sig_strikes_headers_eles_indiv = sig_strikes_headers_eles.find_elements_by_tag_name("th")
 # 
+    for sig_header in sig_strikes_headers_eles_indiv:
+        sig_strike_headers.append(sig_header.text)
+# 
+# 
+    total_strikes_sig_strikes_stats_ele = page_container.find_elements_by_xpath("//tbody[@class='b-fight-details__table-body']")    
+    total_strikes_stats_ele =  total_strikes_sig_strikes_stats_ele[0]
+    total_strikes_stats_ele_vals = total_strikes_stats_ele.find_elements_by_tag_name("p")
 
 
+    for i, stat_val in enumerate(total_strikes_stats_ele_vals):
+        if i % 2 == 0:
+            first_fighter_tot_strikes.append(stat_val.text)
+        else:
+            second_fighter_tot_strikes.append(stat_val.text)
+
+    # print(first_fighter_tot_strikes, "\n")
+    # print(second_fighter_tot_strikes, "\n")
 
 
+    sig_strikes_stats_ele = total_strikes_sig_strikes_stats_ele[2]
+    sig_strikes_stats_ele_vals = sig_strikes_stats_ele.find_elements_by_tag_name("p")
+
+    for i, stat_val in enumerate(sig_strikes_stats_ele_vals):
+        if i % 2 == 0:
+            first_fighter_sig_strikes.append(stat_val.text)
+        else:
+            second_fighter_sig_strikes.append(stat_val.text)
+    # print(first_fighter_sig_strikes, "\n")
+    # print(second_fighter_sig_strikes, "\n")
+
+    strikes_landed_by_target_postion = page_container.find_elements_by_xpath("//div[@class='b-fight-details__charts-row']")
+    strikes_landed_by_target = strikes_landed_by_target_postion[:3]    
+    strikes_landed_by_position = strikes_landed_by_target_postion[3:]
 
 
+    for target in strikes_landed_by_target:
+        strikes_landed_by_target = target.find_elements_by_tag_name("i")
+        strikes_landed_by_target_fighter_1 = strikes_landed_by_target[0]
+        strikes_landed_by_target_names_h_b_l = strikes_landed_by_target[1]
+        strikes_landed_by_target_fighter_2 = strikes_landed_by_target[2]
+        landed_by_target_headers.append(strikes_landed_by_target_names_h_b_l.text)
+        first_fighter_landed_by_target.append(strikes_landed_by_target_fighter_1.text)
+        second_fighter_landed_by_target.append(strikes_landed_by_target_fighter_2.text)
+ 
+    # print("targ = ", landed_by_target_headers, "\n")
+    # print(first_fighter_landed_by_target, "\n")
+    # print(second_fighter_landed_by_target, "\n")
 
 
+    for possition in strikes_landed_by_position:
+        strikes_landed_by_position = possition.find_elements_by_tag_name("i")
+        strikes_landed_by_position_fighter_1 = strikes_landed_by_position[0]
+        strikes_landed_by_position_names_d_c_g = strikes_landed_by_position[1]
+        strikes_landed_by_position_fighter_2 = strikes_landed_by_position[2]
+        landed_by_position_headers.append(strikes_landed_by_position_names_d_c_g.text)
+        first_fighter_landed_by_position.append(strikes_landed_by_position_fighter_1.text)
+        second_fighter_landed_by_position.append(strikes_landed_by_position_fighter_2.text)
 
-    # sig_fighter_names = significant_strikes_header.find_elements_by_tag_name("a")
-    # print(sig_fight_scores.text)
-
-    # print(len(significant_strikes_header))
-    # # for sig_fight_stat in significant_strikes_header:
-    # #     # print(fight_stat)
-    # sig_fight_stat = significant_strikes_header.find_elements_by_tag_name("p")
-    # print("=========")
-    # print(sig_fight_stat)
-    # print("==========")
-    # for s in sig_fight_stat:
-    #     print(s.text)
-        # significant_strikes_vals.append(s.text)
+    # print("targ = ", landed_by_position_headers, "\n")
+    # print(first_fighter_landed_by_position, "\n")
+    # print(second_fighter_landed_by_position, "\n")
 
 
-    # significant_strike_col_names = significant_strikes_header.find_elements_by_tag_name("th")
-    # fight_scores_sig = significant_strikes_header.find_elements_by_xpath("//table//tbody/tr")[1]
-    # print(fight_scores_sig.text)
-
-    # fighter_names_sig = fight_scores_sig.find_elements_by_tag_name("a")
-    # fight_stats_tots_sig = fighter_names_sig.find_elements_by_xpath("td")
-    # print(fight_stats_tots_sig)
-
-    # print(significant_strikes_header.text)
-    # significant_strikes_header_names.append(significant_strikes_header.text)
-    # print(len(significant_strikes_header))
-    # for table in significant_strikes_header:
-    #     print(table.text)
-############################
-    # for fighter_detail in fight_details_person:
-    #     # Fight result and corresponding fighter name
-    #     w_or_l = fighter_detail.find_element_by_tag_name("i").text
-    #     name = fighter_detail.find_element_by_tag_name("a").text
-    #     w_or_l_fighter_name.append((w_or_l, name))
-
-    # for col in striking_columns:
-    #     total_strike_headers.append(col.text)
-
-    # for name in fighter_names:
-    #     fighter_name_total_strike.append(name.text)
-
-    # for fight_stat in fight_stats_tots:
-    #     # print(fight_stat)
-    #     stat = fight_stat.find_elements_by_tag_name("p")
-    #     for s in stat:
-    #         # print(s.text)
-    #         fighter_striking_stats.append(s.text)
-
-    # for col_name in sig_fighter_names:
-    #     significant_strikes_col_names.append(col_name.text)
-
-    # for fight_stat in sig_fight_stats_tots:
-    #     stat = fight_stat.find_elements_by_tag_name("p")
-    #     for s in stat:
-    #         # print(s.text)
-    #         significant_strikes_vals.append(s.text)
-
-
-
-############################
-
-        # print(name.text)
-        # print("------")
-
-finally:
     driver.quit()
 
-#%%
-# print(w_or_l_fighter_name, "\n")
-# print(total_strike_headers, "\n")
-# print(fighter_name_total_strike, "\n")
-# print(fighter_striking_stats, "\n")
-# print(significant_strikes_col_names, "\n")
-# print(significant_strikes_vals, "\n")
-# # %%
+    return weight_division, w_or_l_fighter_name, total_strike_headers, first_fighter_tot_strikes, second_fighter_tot_strikes, sig_strike_headers, first_fighter_sig_strikes, second_fighter_sig_strikes, landed_by_target_headers, first_fighter_landed_by_target, second_fighter_landed_by_target, landed_by_position_headers, first_fighter_landed_by_position, second_fighter_landed_by_position
+
+executable_path = '/usr/bin/chromedriver'
+driver = webdriver.Chrome(executable_path=executable_path)
+URL = 'http://www.ufcstats.com/fight-details/6cd44e1b2d093ea4'
+
+a = get_fight_stats(URL, driver)
+
+for i in a:
+    print(i)
