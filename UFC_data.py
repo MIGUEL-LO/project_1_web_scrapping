@@ -51,83 +51,17 @@ def links_to_fights_stats_1_vs_1(fight_event_links_ls, driver):
     finally:
         driver.quit()
 
-
-
-#############################
-#############################
-#############################
-#############################
-
-def fight_link_in_fight_night(fight_event_link, driver):
-
-    try:
-        all_fights_links_1_vs_1 = []
-        counts = []        
-        driver.get(fight_event_link)
-        fight_links_in_fight_night_ = driver.find_elements_by_xpath("//tbody[@class='b-fight-details__table-body']/tr")
-
-    finally:
-        driver.quit()
-    
-    return fight_link_in_fight_night_
-
-
-def links_to_fights_stats_1_vs_1(fight_event_links_ls, driver):
-    
-    try :
-
-        all_fights_links_1_vs_1 = []
-        counts = []
-        for fight_night_event_link in fight_event_links_ls:
-            count = 0
-            # link_fight_night = fight_event_links_ls[fight_night_event_idx]
-            # finding the elements with the class to find the link for particular fight.
-            driver.get(fight_night_event_link)
-            fights_links_in_fight_night = driver.find_elements_by_xpath("//tbody[@class='b-fight-details__table-body']/tr")
-            for fight_1_vs_1_link in fights_links_in_fight_night:
-                count += 1
-                # contains all fight 1 vs 1 links from which will get stats.
-                all_fights_links_1_vs_1.append(fight_1_vs_1_link.get_attribute("data-link"))
-            counts.append(count)
-        
-        if sum(counts) == len(all_fights_links_1_vs_1):
-            return all_fights_links_1_vs_1
-        else:
-            return 0
-    finally:
-        driver.quit()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#############################
-#############################
-#############################
-#############################
-
+#%%
 
 def links_to_fights_stats_1_vs_1_test_range(fight_event_links_ls, driver):
     try:
         all_fights_links_1_vs_1 = []
         counts = []
         fight_event_links_ls = fight_event_links_ls[1:]
-        # for fight_night_event_idx in range(1, len(fight_event_links_ls)):
-        #     count = 0
-        #     link_fight_night = fight_event_links_ls[fight_night_event_idx]
-        for link_fight_night in fight_event_links_ls:
+        for fight_night_event_idx in range(1, len(fight_event_links_ls)):
+            count = 0
+            link_fight_night = fight_event_links_ls[fight_night_event_idx]
+        # for link_fight_night in fight_event_links_ls:
             count = 0
             # finding the elements with the class to find the link for particular fight.
             driver.get(link_fight_night)
@@ -144,12 +78,12 @@ def links_to_fights_stats_1_vs_1_test_range(fight_event_links_ls, driver):
             return 0
     finally:
         driver.quit()
-# %%
+
 
 
 links_to_fight_night_events_, driver = links_to_fight_night_events()
 # print(links_to_fight_night_events_)
-fight_links_stats = links_to_fights_stats_1_vs_1_test_range(links_to_fight_night_events_, driver)
+fight_links_stats = links_to_fights_stats_1_vs_1(links_to_fight_night_events_, driver)
 print(fight_links_stats)
 # print(fight_links)
 # print(len(fight_links))
