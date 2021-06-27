@@ -139,7 +139,7 @@ def get_fight_stats(URL, driver):
             first_fighter_sig_strikes.append(stat_val.text)
         else:
             second_fighter_sig_strikes.append(stat_val.text)
-    # print(first_fighter_sig_strikes, "\n")
+    # print(first_fighter_sig_strikes, "\n") 
     # print(second_fighter_sig_strikes, "\n")
 
     strikes_landed_by_target_postion = page_container.find_elements_by_xpath("//div[@class='b-fight-details__charts-row']")

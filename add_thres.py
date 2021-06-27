@@ -18,6 +18,7 @@ def links_to_fight_night_events_test(URL="http://www.ufcstats.com/statistics/eve
     fight_event_links_ls = fight_event_links_ls[1:]
     return fight_event_links_ls
 fight_event_links = links_to_fight_night_events_test()
+
 #%%
 # fight_event_link = fight_event_links[0]
 ####################
