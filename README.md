@@ -1,4 +1,4 @@
-# project_1_web_scrapping
+# Data Pipeline for MMA
 The aim of this project is to scrape the data found on UFC's stat website, clean it and store on an AWS's RDS.
 
 Which will later be used in making a model to come up with the most efficient way of fighting depending on your oponents style.
